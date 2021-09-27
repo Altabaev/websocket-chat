@@ -9,7 +9,7 @@ import (
 	"wbchat/internal/app"
 )
 
-var addr = flag.String("addr", ":8080", "http service address")
+var addr = flag.String("addr", ":9090", "http service address")
 var logger = logrus.New()
 
 func main() {
@@ -17,7 +17,7 @@ func main() {
 	flag.Parse()
 
 	hub := app.NewHub(logger) // инициализация центра управления
-	go hub.Run() // запускаем в отдельной горутине
+	go hub.Run()              // запускаем в отдельной горутине
 
 	// привязываем обработчик и запускаем сервер
 	http.HandleFunc("/ws", wsHandler(hub))
@@ -47,12 +47,10 @@ func wsHandler(hub *app.Hub) http.HandlerFunc {
 
 		logger.Info("New connection")
 		client := app.NewClient(hub, conn, logger) // инициализируем нового клиента на подключение
-		hub.Register <- client // регисрируем клиента в центре управления
+		hub.Register <- client                     // регисрируем клиента в центре управления
 
 		// запускаем горутины обслуживающие ввод/вывод конкретного клиента
 		go client.Read()
 		go client.Write()
 	}
 }
-
-

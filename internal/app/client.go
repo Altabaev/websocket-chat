@@ -2,15 +2,16 @@ package app
 
 import (
 	"bytes"
+	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
 	"time"
 )
 
 const (
-	writeWait = 10 * time.Second
-	pongWait = 60 * time.Second
-	pingPeriod = (pongWait * 9) / 10
+	writeWait      = 10 * time.Second
+	pongWait       = 60 * time.Second
+	pingPeriod     = (pongWait * 9) / 10
 	maxMessageSize = 512
 )
 
@@ -20,6 +21,7 @@ var (
 )
 
 type Client struct {
+	Id     string
 	Hub    *Hub
 	Conn   *websocket.Conn
 	Send   chan []byte
@@ -28,6 +30,7 @@ type Client struct {
 
 func NewClient(hub *Hub, conn *websocket.Conn, logger *logrus.Logger) *Client {
 	return &Client{
+		Id:     uuid.NewString(),
 		Hub:    hub,
 		Conn:   conn,
 		Send:   make(chan []byte, 256),
