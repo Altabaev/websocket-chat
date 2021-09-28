@@ -2,6 +2,6 @@ package models
 
 type Message struct {
 	Type     string `json:"type"`
-	ClientId string `json:"client_id"`
+	ClientId string `json:"clientId"`
 	Content  string `json:"content"`
 }

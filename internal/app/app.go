@@ -1,6 +1,7 @@
 package app
 
 import (
+	"github.com/gorilla/sessions"
 	"github.com/sirupsen/logrus"
 	"log"
 	"net/http"
@@ -27,7 +28,7 @@ func (a *app) Start() {
 	hub := NewHub(a.logger) // инициализация центра управления
 	go hub.Run()            // запускаем в отдельной горутине
 
-	server := NewServer(hub, a.logger)
+	server := NewServer(hub, a.logger, sessions.NewCookieStore([]byte(a.config.CookieKey)))
 
 	a.logger.Infof("Application ready on http://localhost%s", a.config.Port)
 

@@ -1,3 +1,4 @@
 log_level = "debug"
 port = ":9090"
+cookie_key = "sdfadfkljsabdfk12k342kijbvksjdfksjhkh"
 database_url = "host=localhost dbname=wbchat user=ilia password=1234 sslmode=disable"

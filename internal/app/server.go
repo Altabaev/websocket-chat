@@ -3,23 +3,30 @@ package app
 import (
 	"encoding/json"
 	"github.com/gorilla/mux"
+	"github.com/gorilla/sessions"
 	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
 	"log"
 	"net/http"
 )
 
+const (
+	sessionName = "WSChat"
+)
+
 type server struct {
-	hub    *hub
-	router *mux.Router
-	logger *logrus.Logger
+	hub          *hub
+	router       *mux.Router
+	logger       *logrus.Logger
+	sessionStore sessions.Store
 }
 
-func NewServer(hub *hub, logger *logrus.Logger) *server {
+func NewServer(hub *hub, logger *logrus.Logger, sessionStore sessions.Store) *server {
 	s := &server{
-		hub:    hub,
-		router: mux.NewRouter(),
-		logger: logger,
+		hub:          hub,
+		router:       mux.NewRouter(),
+		logger:       logger,
+		sessionStore: sessionStore,
 	}
 
 	s.configureRouter()

@@ -6,6 +6,10 @@ import (
 	"wbchat/internal/models"
 )
 
+const (
+	firstContactMessageType = "client_id"
+)
+
 type hub struct {
 	Broadcast  chan []byte
 	Register   chan *client
@@ -29,6 +33,17 @@ func (h *hub) Run() {
 		select {
 		case client := <-h.Register:
 			h.Clients[client.Id] = client // регистрируем нового клиента в хеш-таблице
+			// отправляем клиенту его идентификатор
+			message := &models.Message{
+				Type:     firstContactMessageType,
+				ClientId: client.Id,
+				Content:  client.Id,
+			}
+			data, err := json.Marshal(message)
+			if err != nil {
+				return
+			}
+			client.Send <- data
 		case client := <-h.Unregister:
 			// если такой клиент зарегистрирован, удаляем из хеш-таблицы и закрываем его канал
 			if _, ok := h.Clients[client.Id]; ok {
@@ -46,8 +61,12 @@ func (h *hub) Run() {
 
 			// каждое новое сообщение рассылается каждому зарегистрированному клиенту
 			for _, client := range h.Clients {
+				if message.ClientId == client.Id {
+					continue
+				}
 				select {
 				case client.Send <- data:
+					h.logger.Info("New message")
 				default:
 					// если канал клиента недоступен, закрываем его и удаляем клиента из хеш-таблицы
 					close(client.Send)
