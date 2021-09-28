@@ -3,28 +3,28 @@ package app
 import (
 	"encoding/json"
 	"github.com/sirupsen/logrus"
+	"wbchat/internal/models"
 )
 
-type Hub struct {
+type hub struct {
 	Broadcast  chan []byte
-	Register   chan *Client
-	Unregister chan *Client
-	Clients    map[string]*Client
+	Register   chan *client
+	Unregister chan *client
+	Clients    map[string]*client
 	logger     *logrus.Logger
 }
 
-func NewHub(logger *logrus.Logger) *Hub {
-	return &Hub{
-		Clients:    make(map[string]*Client),
+func NewHub(logger *logrus.Logger) *hub {
+	return &hub{
+		Clients:    make(map[string]*client),
 		Broadcast:  make(chan []byte),
-		Register:   make(chan *Client),
-		Unregister: make(chan *Client),
+		Register:   make(chan *client),
+		Unregister: make(chan *client),
 		logger:     logger,
 	}
 }
 
-func (h *Hub) Run() {
-	h.logger.Info("Hub runned")
+func (h *hub) Run() {
 	for {
 		select {
 		case client := <-h.Register:
@@ -36,7 +36,7 @@ func (h *Hub) Run() {
 				close(client.Send)
 			}
 		case data := <-h.Broadcast:
-			message := &Message{}
+			message := &models.Message{}
 			err := json.Unmarshal(data, message)
 			if err != nil {
 				logrus.Info(string(data))

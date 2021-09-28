@@ -20,16 +20,16 @@ var (
 	space   = []byte{' '}
 )
 
-type Client struct {
+type client struct {
 	Id     string
-	Hub    *Hub
+	Hub    *hub
 	Conn   *websocket.Conn
 	Send   chan []byte
 	logger *logrus.Logger
 }
 
-func NewClient(hub *Hub, conn *websocket.Conn, logger *logrus.Logger) *Client {
-	return &Client{
+func NewClient(hub *hub, conn *websocket.Conn, logger *logrus.Logger) *client {
+	return &client{
 		Id:     uuid.NewString(),
 		Hub:    hub,
 		Conn:   conn,
@@ -38,7 +38,7 @@ func NewClient(hub *Hub, conn *websocket.Conn, logger *logrus.Logger) *Client {
 	}
 }
 
-func (c *Client) Read() {
+func (c *client) Read() {
 	// отложено снимаем клиента с регистрации и закрываем соедениение
 	defer func() {
 		c.Hub.Unregister <- c
@@ -76,7 +76,7 @@ func (c *Client) Read() {
 	}
 }
 
-func (c *Client) Write() {
+func (c *client) Write() {
 	ticker := time.NewTicker(pingPeriod)
 
 	defer func() {
